@@ -8,7 +8,10 @@ This app allows you to keep track of items you need to pack for a trip.
 - Mark items as packed/unpacked
 - Remove items from the list
 - Simple and responsive UI
-
+- Sorting — Sort items by input order, description, or packed status.
+- Clear All with Confirmation — Prevent accidental list deletion with a modal confirmation.
+- Stats — Shows total items, packed items, and packing percentage.
+  
 ## 🚀 Live Demo
 [https://packinglistapp.netlify.app/]
 
