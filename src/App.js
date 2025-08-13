@@ -1,8 +1,9 @@
 import { useState } from "react";
+import ConfirmModal from "./ConfirmModal";
 
 export default function App() {
   const [items, setItem] = useState([]);
-
+  const [showModal, setShowModal] = useState(false);
   function handleDeleteItems(id) {
     setItem((currentItems) => currentItems.filter((item) => item.id !== id));
   }
@@ -18,6 +19,19 @@ export default function App() {
       )
     );
   }
+  function handleClear() {
+    setShowModal(true); // Show the modal
+  }
+
+  function confirmClear(items) {
+    setItem((items) => []);
+    setShowModal(false);
+  }
+
+  function cancelClear() {
+    setShowModal(false);
+  }
+
   return (
     <div className="app">
       <Logo />
@@ -26,8 +40,16 @@ export default function App() {
         items={items}
         onDeleteItems={handleDeleteItems}
         onToggleItem={handleToggleItem}
+        onClear={handleClear}
       />
       <Stats items={items} />
+      {showModal && (
+        <ConfirmModal
+          message="Are you sure you want to clear the list?"
+          onConfirm={confirmClear}
+          onCancel={cancelClear}
+        />
+      )}
     </div>
   );
 }
@@ -70,11 +92,27 @@ function Form({ onAddItems }) {
     </form>
   );
 }
-function PackingList({ items, onDeleteItems, onToggleItem }) {
+function PackingList({ items, onDeleteItems, onToggleItem, onClear }) {
+  const [sortBy, setSortBy] = useState("input");
+  let sortItems = [];
+
+  if (sortBy === "input") sortItems = items;
+
+  if (sortBy === "description") {
+    sortItems = items
+      .slice()
+      .sort((a, b) => a.description.localeCompare(b.description));
+  }
+
+  if (sortBy === "packed")
+    sortItems = items
+      .slice()
+      .sort((a, b) => Number(a.packed) - Number(b.packed));
+
   return (
     <div className="list">
       <ul>
-        {items.map((items) => (
+        {sortItems.map((items) => (
           <Items
             Item={items}
             onDeleteItems={onDeleteItems}
@@ -83,6 +121,15 @@ function PackingList({ items, onDeleteItems, onToggleItem }) {
           />
         ))}
       </ul>
+      <div className="actions">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value={"input"}>Sort by input</option>
+          <option value={"description"}>Sort by description</option>
+          <option value={"packed"}>Sort by packed </option>
+        </select>
+
+        <button onClick={onClear}>Clear</button>
+      </div>
     </div>
   );
 }
